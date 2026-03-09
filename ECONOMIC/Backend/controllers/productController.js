@@ -16,8 +16,10 @@ exports.getProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { name, price, description } = req.body;
-    const image = req.file ? req.file.filename : null;
-
+    
+     const image = req.file
+      ? `http://localhost:5000/uploads/${req.file.filename}`
+      : null;
     const result = await pool.query(
       "INSERT INTO products(name, price, description, image) VALUES($1, $2, $3, $4) RETURNING *",
       [name, price, description, image]

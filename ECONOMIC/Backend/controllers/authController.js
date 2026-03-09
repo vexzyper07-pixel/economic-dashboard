@@ -1,9 +1,10 @@
- const pool = require("../config/db");
+ const pool = require("../config/db"); // PostgreSQL connection
 
 
+// ======================
 // SIGNUP
+// ======================
 exports.signup = async (req, res) => {
-
  try {
 
   const { username, email, password } = req.body;
@@ -15,7 +16,7 @@ exports.signup = async (req, res) => {
    });
   }
 
-  // check if user already exists
+  // check if user exists
   const existingUser = await pool.query(
    "SELECT * FROM users WHERE email=$1",
    [email]
@@ -47,26 +48,25 @@ exports.signup = async (req, res) => {
   });
 
  }
-
 };
 
 
 
+// ======================
 // LOGIN
+// ======================
 exports.login = async (req, res) => {
 
  try {
 
   const { email, password } = req.body;
 
-  // validation
   if (!email || !password) {
    return res.status(400).json({
     message: "Email and password required"
    });
   }
 
-  // find user
   const result = await pool.query(
    "SELECT * FROM users WHERE email=$1",
    [email]
@@ -80,7 +80,6 @@ exports.login = async (req, res) => {
 
   const user = result.rows[0];
 
-  // check password
   if (user.password !== password) {
    return res.status(401).json({
     message: "Invalid password"
@@ -95,6 +94,39 @@ exports.login = async (req, res) => {
     email: user.email
    }
   });
+
+ } catch (error) {
+
+  console.error(error);
+
+  res.status(500).json({
+   message: "Server error"
+  });
+
+ }
+
+};
+
+
+
+// ======================
+// CREATE PRODUCT WITH IMAGE
+// ======================
+exports.createProduct = async (req, res) => {
+
+ try {
+
+  const { name, price, description } = req.body;
+
+  // image URL
+  const image = `http://localhost:5000/uploads/${req.file.filename}`;
+
+  const result = await pool.query(
+   "INSERT INTO products (name, price, description, image) VALUES ($1,$2,$3,$4) RETURNING *",
+   [name, price, description, image]
+  );
+
+  res.status(201).json(result.rows[0]);
 
  } catch (error) {
 
