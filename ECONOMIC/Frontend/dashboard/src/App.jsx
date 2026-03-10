@@ -1,5 +1,5 @@
- import {Routes,Route} from "react-router-dom"
-import {useState} from "react"
+ import { Routes, Route, useLocation } from "react-router-dom"
+import { useState } from "react"
 
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
@@ -11,9 +11,20 @@ import Cart from "./pages/Cart"
 import Payment from "./pages/Payment"
 import Signin from "./pages/Signin"
 
+/* Admin Pages */
+import AdminLogin from "./admin/pages/AdminLogin"
+import AdminDashboard from "./admin/pages/AdminDashboard"
+import AddProduct from "./admin/pages/AddProduct"
+import ManageProducts from "./admin/pages/ManageProducts"
+
 function App(){
 
 const [cart,setCart]=useState([])
+
+const location = useLocation()
+
+/* check if admin route */
+const isAdminRoute = location.pathname.startsWith("/admin")
 
 const addToCart=(product)=>{
 
@@ -41,9 +52,12 @@ return(
 
 <div>
 
-<Navbar cartCount={cart.length}/>
+{/* Hide navbar in admin panel */}
+{!isAdminRoute && <Navbar cartCount={cart.length}/>}
 
 <Routes>
+
+{/* Public Routes */}
 
 <Route path="/" element={<Home/>}/>
 
@@ -66,9 +80,21 @@ element={<Cart cart={cart} setCart={setCart}/>}
 
 <Route path="/signin" element={<Signin/>}/>
 
+
+{/* Admin Routes */}
+
+<Route path="/admin/login" element={<AdminLogin/>}/>
+
+<Route path="/admin/dashboard" element={<AdminDashboard/>}/>
+
+<Route path="/admin/add-product" element={<AddProduct/>}/>
+
+<Route path="/admin/manage-products" element={<ManageProducts/>}/>
+
 </Routes>
 
-<Footer/>
+{/* Hide footer in admin panel */}
+{!isAdminRoute && <Footer/>}
 
 </div>
 
