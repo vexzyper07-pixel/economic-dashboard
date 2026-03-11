@@ -1,23 +1,17 @@
 const router = require("express").Router();
- const pool = require("../config/db");
-router.post("/payment", async (req, res) => {
+const auth = require("../middleware/authMiddleware");
+const {
+  addToCart,
+  getCart,
+  updateCartItem,
+  removeCartItem
+} = require("../controllers/cartController");
 
-  try {
+router.use(auth);
 
-    await pool.query(
-      "UPDATE cart SET action='done' WHERE action='pending'"
-    );
-
-    res.json({ success: true });
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({ success: false });
-
-  }
-
-});
+router.get("/", getCart);
+router.post("/", addToCart);
+router.patch("/:id", updateCartItem);
+router.delete("/:id", removeCartItem);
 
 module.exports = router;

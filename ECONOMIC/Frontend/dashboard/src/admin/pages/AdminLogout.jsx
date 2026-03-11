@@ -1,34 +1,21 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AdminLogout() {
+const ADMIN_TOKEN_KEY = "adminToken";
 
+function AdminLogout() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-
-    localStorage.clear(); // remove stored login data
-
-    navigate("/signin");
-
-  };
+  useEffect(() => {
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    navigate("/admin/login");
+  }, [navigate]);
 
   return (
-
-    <div className="container mt-5">
-
-      <h2>Admin Dashboard</h2>
-
-      <button
-        className="btn btn-danger mt-3"
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
-
+    <div className="container mt-5 text-center">
+      <p>Signing you out...</p>
     </div>
-
   );
-
 }
 
 export default AdminLogout;

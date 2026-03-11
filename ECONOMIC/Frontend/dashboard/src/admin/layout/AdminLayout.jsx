@@ -1,28 +1,36 @@
-import AdminSidebar from "../components/AdminSidebar"
-import AdminNavbar from "../components/AdminNavbar"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "../components/AdminSidebar";
+import AdminNavbar from "../components/AdminNavbar";
 
-function AdminLayout({children}){
+const ADMIN_TOKEN_KEY = "adminToken";
 
-  return(
+function AdminLayout({ children }) {
+  const navigate = useNavigate();
+  const [authorized, setAuthorized] = useState(false);
 
-    <div style={{display:"flex"}}>
+  useEffect(() => {
+    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+    if (!token) {
+      navigate("/admin/login");
+    } else {
+      setAuthorized(true);
+    }
+  }, [navigate]);
 
-      <AdminSidebar/>
+  if (!authorized) {
+    return null;
+  }
 
-      <div style={{flex:1}}>
-
-        <AdminNavbar/>
-
-        <div style={{padding:"20px"}}>
-          {children}
-        </div>
-
+  return (
+    <div className="admin-layout">
+      <AdminSidebar />
+      <div className="admin-content">
+        <AdminNavbar />
+        <div className="admin-content-body">{children}</div>
       </div>
-
     </div>
-
-  )
-
+  );
 }
 
-export default AdminLayout
+export default AdminLayout;
