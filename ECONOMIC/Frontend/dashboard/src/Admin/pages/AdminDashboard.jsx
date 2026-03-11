@@ -1,22 +1,19 @@
- import AdminNavbar from "../components/AdminNavbar";
+import AdminLayout from "../layout/AdminLayout"
+
 function AdminDashboard(){
 
-  return (
+  return(
 
-    <div>
+    <AdminLayout>
 
-      <AdminNavbar />
+      <h1>Welcome Admin</h1>
 
-      <h1 style={{textAlign:"center"}}>
+      <p>This is your dashboard panel.</p>
 
-        Welcome Admin
+    </AdminLayout>
 
-      </h1>
-
-    </div>
-
-  );
+  )
 
 }
 
-export default AdminDashboard;
+export default AdminDashboard

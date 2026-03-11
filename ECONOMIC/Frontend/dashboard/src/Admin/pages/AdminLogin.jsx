@@ -1,81 +1,64 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AdminLogin() {
+function AdminLogin(){
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+const [email,setEmail]=useState("")
+const [password,setPassword]=useState("")
 
-  const navigate = useNavigate();
+const navigate=useNavigate()
 
-  const handleLogin = async (e) => {
+const handleLogin=(e)=>{
 
-    e.preventDefault();
+e.preventDefault()
 
-    const response = await fetch("http://localhost:5000/api/admin/login",{
+// later we will connect backend
+if(email==="admin@gmail.com" && password==="1234"){
 
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
+navigate("/admin/dashboard")
 
-      body:JSON.stringify({
-        email,
-        password
-      })
+}else{
 
-    });
-
-    const data = await response.json();
-
-    if(data.token){
-
-      localStorage.setItem("adminToken",data.token);
-
-      navigate("/admin/dashboard");
-
-    }else{
-
-      alert("Login Failed");
-
-    }
-
-  };
-
-  return (
-
-    <div style={{width:"300px", margin:"100px auto"}}>
-
-      <h2>Admin Login</h2>
-
-      <form onSubmit={handleLogin}>
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-        />
-
-        <br/><br/>
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-        />
-
-        <br/><br/>
-
-        <button type="submit">Login</button>
-
-      </form>
-
-    </div>
-
-  );
+alert("Invalid Admin Credentials")
 
 }
 
-export default AdminLogin;
+}
+
+return(
+
+<div style={{width:"300px",margin:"100px auto"}}>
+
+<h2>Admin Login</h2>
+
+<form onSubmit={handleLogin}>
+
+<input
+type="email"
+placeholder="Email"
+value={email}
+onChange={(e)=>setEmail(e.target.value)}
+/>
+
+<br/><br/>
+
+<input
+type="password"
+placeholder="Password"
+value={password}
+onChange={(e)=>setPassword(e.target.value)}
+/>
+
+<br/><br/>
+
+<button type="submit">Login</button>
+
+</form>
+
+</div>
+
+)
+
+}
+
+export default AdminLogin

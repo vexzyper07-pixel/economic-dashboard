@@ -1,24 +1,20 @@
-import { Link } from "react-router-dom";
+function AdminNavbar(){
 
-function AdminNavbar() {
+  return(
 
-  return (
-    <nav style={{background:"#222", color:"#fff", padding:"10px"}}>
+    <div style={{
+      width:"100%",
+      background:"#f1f5f9",
+      padding:"15px",
+      borderBottom:"1px solid #ddd"
+    }}>
 
-      <h2>Admin Panel</h2>
+      <h3>Admin Dashboard</h3>
 
-      <div style={{display:"flex", gap:"20px"}}>
+    </div>
 
-        <Link to="/admin/dashboard">Dashboard</Link>
+  )
 
-        <Link to="/admin/add-product">Add Product</Link>
-
-        <Link to="/admin/manage-products">Manage Products</Link>
-
-      </div>
-
-    </nav>
-  );
 }
 
 export default AdminNavbar;
