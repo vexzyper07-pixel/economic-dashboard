@@ -1,141 +1,55 @@
- const pool = require("../config/db"); // PostgreSQL connection
+ const pool = require("../config/db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-
-// ======================
-// SIGNUP
-// ======================
 exports.signup = async (req, res) => {
- try {
+  try {
+    const { name, email, password } = req.body;
 
-  const { username, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  // validation
-  if (!username || !email || !password) {
-   return res.status(400).json({
-    message: "All fields are required"
-   });
+    const user = await pool.query(
+      "INSERT INTO users(name,email,password) VALUES($1,$2,$3) RETURNING *",
+      [name, email, hashedPassword]
+    );
+
+    res.json(user.rows[0]);
+
+  } catch (err) {
+    res.status(500).json(err.message);
   }
-
-  // check if user exists
-  const existingUser = await pool.query(
-   "SELECT * FROM users WHERE email=$1",
-   [email]
-  );
-
-  if (existingUser.rows.length > 0) {
-   return res.status(409).json({
-    message: "Email already registered"
-   });
-  }
-
-  // insert user
-  const result = await pool.query(
-   "INSERT INTO users(username,email,password) VALUES($1,$2,$3) RETURNING id,username,email",
-   [username, email, password]
-  );
-
-  res.status(201).json({
-   message: "Signup successful",
-   user: result.rows[0]
-  });
-
- } catch (error) {
-
-  console.error(error);
-
-  res.status(500).json({
-   message: "Server error"
-  });
-
- }
 };
 
-
-
-// ======================
-// LOGIN
-// ======================
 exports.login = async (req, res) => {
+  try {
 
- try {
+    const { email, password } = req.body;
 
-  const { email, password } = req.body;
+    const user = await pool.query(
+      "SELECT * FROM users WHERE email=$1",
+      [email]
+    );
 
-  if (!email || !password) {
-   return res.status(400).json({
-    message: "Email and password required"
-   });
+    if (user.rows.length === 0)
+      return res.status(400).json("User not found");
+
+    const valid = await bcrypt.compare(password, user.rows[0].password);
+
+    if (!valid)
+      return res.status(401).json("Invalid password");
+
+    const token = jwt.sign(
+      { id: user.rows[0].id, role: user.rows[0].role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      token,
+      user: user.rows[0]
+    });
+
+  } catch (err) {
+    res.status(500).json(err.message);
   }
-
-  const result = await pool.query(
-   "SELECT * FROM users WHERE email=$1",
-   [email]
-  );
-
-  if (result.rows.length === 0) {
-   return res.status(401).json({
-    message: "User not found"
-   });
-  }
-
-  const user = result.rows[0];
-
-  if (user.password !== password) {
-   return res.status(401).json({
-    message: "Invalid password"
-   });
-  }
-
-  res.json({
-   message: "Login successful",
-   user: {
-    id: user.id,
-    username: user.username,
-    email: user.email
-   }
-  });
-
- } catch (error) {
-
-  console.error(error);
-
-  res.status(500).json({
-   message: "Server error"
-  });
-
- }
-
-};
-
-
-
-// ======================
-// CREATE PRODUCT WITH IMAGE
-// ======================
-exports.createProduct = async (req, res) => {
-
- try {
-
-  const { name, price, description } = req.body;
-
-  // image URL
-  const image = `http://localhost:5000/uploads/${req.file.filename}`;
-
-  const result = await pool.query(
-   "INSERT INTO products (name, price, description, image) VALUES ($1,$2,$3,$4) RETURNING *",
-   [name, price, description, image]
-  );
-
-  res.status(201).json(result.rows[0]);
-
- } catch (error) {
-
-  console.error(error);
-
-  res.status(500).json({
-   message: "Server error"
-  });
-
- }
-
 };
